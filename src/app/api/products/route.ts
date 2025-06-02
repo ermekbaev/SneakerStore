@@ -96,13 +96,13 @@ export async function GET(request: NextRequest) {
             rating: 4.0 + Math.random(),
           };
           
-          // console.log(`🎯 Результат для фронтенда:`, {
-          //   slug: result.slug,
-          //   imageUrl: result.imageUrl,
-          //   colorsCount: result.colors.length,
-          //   sizesCount: result.sizes.length,
-          //   hasRealImage: !result.imageUrl.includes('placehold')
-          // });
+          console.log(`🎯 Результат для фронтенда:`, {
+            slug: result.slug,
+            imageUrl: result.imageUrl,
+            colorsCount: result.colors.length,
+            sizesCount: result.sizes.length,
+            hasRealImage: !result.imageUrl.includes('placehold')
+          });
           
           return result;
           
