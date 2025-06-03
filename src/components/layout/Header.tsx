@@ -5,19 +5,11 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
+import AdvancedSearchBar from '@/components/search/AdvancedSearchBar';
 
 const Header = () => {
   const [cartCount] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      // Navigate to search results
-      window.location.href = `/catalog?search=${encodeURIComponent(searchQuery.trim())}`;
-    }
-  };
 
   return (
     <header className="sticky top-0 z-50 w-full backdrop-blur-lg bg-white/90 border-b border-emerald-100 shadow-sm">
@@ -64,36 +56,23 @@ const Header = () => {
             </Link>
           </nav>
 
-          {/* Search Bar */}
+          {/* Advanced Search Bar - Desktop */}
           <div className="hidden lg:flex flex-1 max-w-sm mx-8">
-            <form onSubmit={handleSearch} className="relative w-full">
-              <input
-                type="text"
-                placeholder="Поиск кроссовок..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-2 pl-10 pr-4 border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all bg-white text-gray-800"
-              />
-              <button
-                type="submit"
-                className="absolute left-3 top-2.5 h-5 w-5 text-emerald-400 hover:text-emerald-600 transition-colors"
-              >
-                <svg
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </button>
-            </form>
+            <AdvancedSearchBar 
+              placeholder="Поиск кроссовок..."
+              showHistory={true}
+            />
           </div>
 
           {/* Right Actions */}
           <div className="flex items-center space-x-4">
+            {/* Search Icon for Mobile */}
+            <button className="lg:hidden p-2 text-gray-600 hover:text-emerald-600 transition-colors">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </button>
+
             {/* Favorites */}
             <Link href="/favorites">
               <Button variant="ghost" size="icon" className="hidden sm:flex relative border border-emerald-200 bg-white">
@@ -128,7 +107,7 @@ const Header = () => {
                 {cartCount > 0 && (
                   <Badge 
                     variant="default" 
-                    className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs "
+                    className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs"
                   >
                     {cartCount}
                   </Badge>
@@ -175,23 +154,11 @@ const Header = () => {
             <div className="flex flex-col space-y-4">
               {/* Mobile Search */}
               <div className="px-2">
-                <form onSubmit={handleSearch} className="relative">
-                  <input
-                    type="text"
-                    placeholder="Поиск кроссовок..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full px-4 py-2 pr-10 border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                  />
-                  <button
-                    type="submit"
-                    className="absolute right-3 top-2.5 h-5 w-5 text-emerald-400"
-                  >
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                  </button>
-                </form>
+                <AdvancedSearchBar 
+                  placeholder="Поиск кроссовок..."
+                  showHistory={true}
+                  className="w-full"
+                />
               </div>
               
               {/* Mobile Navigation Links */}

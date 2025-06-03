@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/hooks/useAdvancedSearch.ts
 'use client';
 
@@ -131,7 +129,7 @@ export const useAdvancedSearch = (): UseAdvancedSearchReturn => {
             id: `product-${product.slug}`,
             type: 'product',
             title: product.Name,
-            subtitle: `${product.brandName} • ${product.Price}₽`,
+            subtitle: `${product.brandName} • ${product.Price?.toLocaleString('ru-RU')}₽`,
             imageUrl: product.imageUrl,
             url: `/product/${product.slug}`
           });
@@ -174,8 +172,7 @@ export const useAdvancedSearch = (): UseAdvancedSearchReturn => {
       });
 
       setSuggestions(newSuggestions);
-    } catch (error) {
-        //@ts-ignore
+    } catch (error: any) {
       if (error.name !== 'AbortError') {
         console.error('Ошибка получения suggestions:', error);
         setSuggestions([]);
@@ -208,8 +205,8 @@ export const useAdvancedSearch = (): UseAdvancedSearchReturn => {
     setIsOpen(false);
     setQuery('');
     
-    // Перенаправляем на страницу результатов
-    window.location.href = `/catalog?search=${encodeURIComponent(finalQuery)}`;
+    // Перенаправляем на страницу поиска
+    window.location.href = `/search?q=${encodeURIComponent(finalQuery)}`;
   }, [query, saveSearchHistory]);
 
   // Обработка клавиатуры
