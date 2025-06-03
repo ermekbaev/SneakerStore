@@ -7,6 +7,8 @@ import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
+import useCart from '@/components/providers/CartProvider';
+import { useToast } from '@/components/providers/ToastProvider';
 
 // Утилита для получения кода цвета
 const getColorCode = (colorName: string): string => {
@@ -38,9 +40,6 @@ const getColorCode = (colorName: string): string => {
     'Purple': '#7c3aed',
     'Оранжевый': '#ea580c',
     'Orange': '#ea580c',
-    'Голубой': '#0ea5e9',
-    'Navy': '#1e3a8a',
-    'Темно-синий': '#1e3a8a',
     
     // Дополнительные оттенки
     'Бежевый': '#f5f5dc',
@@ -116,6 +115,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+  
+  // ✅ ДОБАВЛЯЕМ ИНТЕГРАЦИЮ С КОРЗИНОЙ
+  const { addToCart } = useCart();
+  const { success, error } = useToast();
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('ru-RU', {
@@ -143,6 +147,62 @@ const ProductCard: React.FC<ProductCardProps> = ({
     }
 
     return stars;
+  };
+
+  // ✅ ОБРАБОТЧИК ДОБАВЛЕНИЯ В КОРЗИНУ
+  const handleAddToCart = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    setIsAddingToCart(true);
+    
+    try {
+      console.log('🛒 Добавляем товар в корзину:', product.slug);
+      
+      // Подготавливаем данные для корзины
+      const productForCart = {
+        slug: product.slug,
+        Name: product.Name,
+        Price: product.Price,
+        imageUrl: product.imageUrl
+      };
+      
+      // Используем первый доступный цвет или создаем дефолтный
+      const colorForCart = {
+        id: 1,
+        Name: product.colors && product.colors.length > 0 ? product.colors[0] : 'Стандартный'
+      };
+      
+      // Используем первый доступный размер или дефолтный
+      const sizeForCart = product.sizes && product.sizes.length > 0 ? product.sizes[0] : 42;
+      
+      console.log('📦 Данные для корзины:', {
+        product: productForCart,
+        color: colorForCart,
+        size: sizeForCart
+      });
+      
+      const result = await addToCart(productForCart, colorForCart, sizeForCart);
+      
+      if (result) {
+        success(`${product.Name} добавлен в корзину`);
+        console.log('✅ Товар успешно добавлен в корзину');
+      } else {
+        error('Не удалось добавить товар в корзину');
+        console.log('❌ Ошибка добавления в корзину');
+      }
+      
+      // Вызываем переданный обработчик если есть
+      if (onAddToCart) {
+        onAddToCart();
+      }
+      
+    } catch (err) {
+      console.error('💥 Критическая ошибка при добавлении в корзину:', err);
+      error('Произошла ошибка при добавлении товара');
+    } finally {
+      setIsAddingToCart(false);
+    }
   };
 
   return (
@@ -223,19 +283,27 @@ const ProductCard: React.FC<ProductCardProps> = ({
             </svg>
           </Button>
 
-          {/* Quick Actions */}
+          {/* Quick Actions - ОБНОВЛЕННАЯ КНОПКА */}
           <div className={`absolute bottom-3 left-3 right-3 transition-all duration-300 ${
             isHovered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
           }`}>
             <Button
               variant="gradient"
               className="w-full shadow-lg"
-              onClick={(e) => {
-                e.preventDefault();
-                onAddToCart?.();
-              }}
+              onClick={handleAddToCart}
+              disabled={isAddingToCart}
             >
-              Добавить в корзину
+              {isAddingToCart ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Добавление...
+                </>
+              ) : (
+                'Добавить в корзину'
+              )}
             </Button>
           </div>
         </div>

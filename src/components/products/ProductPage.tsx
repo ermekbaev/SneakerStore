@@ -1,4 +1,4 @@
-// src/components/product/ProductPage.tsx - АДАПТИВНАЯ ВЕРСИЯ
+// src/components/products/ProductPage.tsx - ОБНОВЛЕННАЯ ВЕРСИЯ
 'use client';
 
 import React, { useState } from 'react';
@@ -8,7 +8,7 @@ import ProductInfo from './ProductInfo';
 import ProductTabs from './ProductTabs';
 import ProductBreadcrumbs from './ProductBreadcrumbs';
 import RelatedProducts from './RelatedProducts';
-import useCart from '@/hooks/useCart';
+import { useCart } from '@/components/providers/CartProvider'; // ✅ ОБНОВЛЕННЫЙ ИМПОРТ
 import { useFavorites } from '@/hooks/useFavorites';
 import { useToast } from '@/components/providers/ToastProvider';
 
@@ -59,6 +59,8 @@ interface ProductPageProps {
 
 const ProductPage: React.FC<ProductPageProps> = ({ product }) => {
   const router = useRouter();
+  
+  // ✅ ИСПОЛЬЗУЕМ КОНТЕКСТ КОРЗИНЫ
   const { addToCart, isInCart, getItemQuantity } = useCart();
   const { toggleFavorite, isFavorite } = useFavorites();
   const { success, error } = useToast();
@@ -79,7 +81,7 @@ const ProductPage: React.FC<ProductPageProps> = ({ product }) => {
     ? getItemQuantity(product.slug, selectedColor.id, parseInt(selectedSize.value))
     : 0;
 
-  // Обработчик добавления в корзину
+  // ✅ ОБНОВЛЕННЫЙ ОБРАБОТЧИК ДОБАВЛЕНИЯ В КОРЗИНУ
   const handleAddToCart = async () => {
     if (!selectedColor) {
       error('Выберите цвет товара');
@@ -99,6 +101,16 @@ const ProductPage: React.FC<ProductPageProps> = ({ product }) => {
     setIsAddingToCart(true);
 
     try {
+      console.log('🛒 ProductPage: Добавляем товар в корзину');
+      console.log('📦 ProductPage: Данные товара:', {
+        slug: product.slug,
+        Name: product.Name,
+        Price: product.Price,
+        imageUrl: product.imageUrl
+      });
+      console.log('🎨 ProductPage: Выбранный цвет:', selectedColor);
+      console.log('📏 ProductPage: Выбранный размер:', selectedSize);
+
       const productForCart = {
         slug: product.slug,
         Name: product.Name,
@@ -111,19 +123,19 @@ const ProductPage: React.FC<ProductPageProps> = ({ product }) => {
         Name: selectedColor.name
       };
 
-      const success_result = await addToCart(
-        productForCart,
-        colorForCart,
-        parseInt(selectedSize.value)
-      );
+      const sizeForCart = parseInt(selectedSize.value);
 
-      if (success_result) {
+      const successResult = await addToCart(productForCart, colorForCart, sizeForCart);
+
+      if (successResult) {
         success(`${product.Name} добавлен в корзину`);
+        console.log('✅ ProductPage: Товар успешно добавлен в корзину');
       } else {
         error('Не удалось добавить товар в корзину');
+        console.log('❌ ProductPage: Ошибка добавления товара');
       }
     } catch (err) {
-      console.error('Error adding to cart:', err);
+      console.error('💥 ProductPage: Критическая ошибка:', err);
       error('Произошла ошибка при добавлении товара');
     } finally {
       setIsAddingToCart(false);
@@ -133,9 +145,10 @@ const ProductPage: React.FC<ProductPageProps> = ({ product }) => {
   // Обработчик добавления в избранное
   const handleToggleFavorite = () => {
     try {
+      const wasInFavorites = isFavorite(product.slug);
       toggleFavorite(product.slug);
       
-      if (isFavorite(product.slug)) {
+      if (wasInFavorites) {
         success('Товар удален из избранного');
       } else {
         success('Товар добавлен в избранное');
@@ -241,7 +254,18 @@ const ProductPage: React.FC<ProductPageProps> = ({ product }) => {
 
         {/* ✅ АДАПТИВНЫЕ ПОХОЖИЕ ТОВАРЫ */}
         <RelatedProducts 
-          currentProduct={product}
+          currentProduct={{
+            slug: product.slug,
+            Name: product.Name,
+            brandName: product.brandName,
+            Price: product.Price,
+            imageUrl: product.imageUrl,
+            colors: product.colors.map(c => c.name),
+            sizes: product.sizes.map(s => parseInt(s.value)),
+            genders: product.genders,
+            categoryName: product.categoryName,
+            description: product.description
+          }}
           category={product.categoryName}
           brand={product.brandName}
         />
