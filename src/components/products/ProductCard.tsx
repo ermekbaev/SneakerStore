@@ -8,6 +8,84 @@ import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 
+// Утилита для получения кода цвета
+const getColorCode = (colorName: string): string => {
+  const colorMap: Record<string, string> = {
+    // Основные цвета
+    'Черный': '#1a1a1a',
+    'Чёрный': '#1a1a1a',
+    'Black': '#1a1a1a',
+    'Белый': '#ffffff',
+    'White': '#ffffff',
+    'Красный': '#dc2626',
+    'Red': '#dc2626',
+    'Синий': '#2563eb',
+    'Blue': '#2563eb',
+    'Зеленый': '#059669',
+    'Зелёный': '#059669',
+    'Green': '#059669',
+    'Желтый': '#eab308',
+    'Жёлтый': '#eab308',
+    'Yellow': '#eab308',
+    'Серый': '#6b7280',
+    'Gray': '#6b7280',
+    'Grey': '#6b7280',
+    'Коричневый': '#92400e',
+    'Brown': '#92400e',
+    'Розовый': '#ec4899',
+    'Pink': '#ec4899',
+    'Фиолетовый': '#7c3aed',
+    'Purple': '#7c3aed',
+    'Оранжевый': '#ea580c',
+    'Orange': '#ea580c',
+    'Голубой': '#0ea5e9',
+    'Navy': '#1e3a8a',
+    'Темно-синий': '#1e3a8a',
+    
+    // Дополнительные оттенки
+    'Бежевый': '#f5f5dc',
+    'Beige': '#f5f5dc',
+    'Хаки': '#9ca3af',
+    'Khaki': '#9ca3af',
+    'Золотой': '#fbbf24',
+    'Gold': '#fbbf24',
+    'Серебряный': '#e5e7eb',
+    'Silver': '#e5e7eb',
+    'Бордовый': '#991b1b',
+    'Maroon': '#991b1b',
+    'Teal': '#0d9488',
+    'Бирюзовый': '#0d9488',
+    'Lime': '#65a30d',
+    'Лайм': '#65a30d',
+    'Индиго': '#4338ca',
+    'Indigo': '#4338ca',
+    
+    // Сложные названия
+    'Темно-серый': '#374151',
+    'Светло-серый': '#d1d5db',
+    'Темно-зеленый': '#064e3b',
+    'Светло-голубой': '#7dd3fc',
+    'Мультиколор': 'linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #f9ca24)',
+    'Multicolor': 'linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #f9ca24)',
+  };
+
+  // Проверяем точное совпадение
+  if (colorMap[colorName]) {
+    return colorMap[colorName];
+  }
+  
+  // Проверяем частичное совпадение (без учета регистра)
+  const lowerColorName = colorName.toLowerCase();
+  for (const [key, value] of Object.entries(colorMap)) {
+    if (key.toLowerCase().includes(lowerColorName) || lowerColorName.includes(key.toLowerCase())) {
+      return value;
+    }
+  }
+  
+  // Если цвет не найден, возвращаем серый
+  return '#6b7280';
+};
+
 interface ProductCardProps {
   product: {
     slug: string;
@@ -192,13 +270,22 @@ const ProductCard: React.FC<ProductCardProps> = ({
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-500">Цвета:</span>
               <div className="flex gap-1">
-                {product.colors.slice(0, 4).map((color, index) => (
-                  <div
-                    key={index}
-                    className="w-4 h-4 rounded-full border-2 border-gray-200"
-                    title={color}
-                  />
-                ))}
+                {product.colors.slice(0, 4).map((color, index) => {
+                  const colorCode = getColorCode(color);
+                  const isGradient = colorCode.includes('gradient');
+                  
+                  return (
+                    <div
+                      key={index}
+                      className="w-4 h-4 rounded-full border-2 border-gray-300 hover:border-gray-400 transition-colors"
+                      style={isGradient 
+                        ? { background: colorCode } 
+                        : { backgroundColor: colorCode }
+                      }
+                      title={color}
+                    />
+                  );
+                })}
                 {product.colors.length > 4 && (
                   <span className="text-xs text-gray-400 ml-1">
                     +{product.colors.length - 4}

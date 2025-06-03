@@ -9,6 +9,15 @@ import { Badge } from '@/components/ui/Badge';
 const Header = () => {
   const [cartCount] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      // Navigate to search results
+      window.location.href = `/catalog?search=${encodeURIComponent(searchQuery.trim())}`;
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full backdrop-blur-lg bg-white/90 border-b border-emerald-100 shadow-sm">
@@ -39,7 +48,7 @@ const Header = () => {
               Бренды
             </Link>
             <Link 
-              href="/sale" 
+              href="/catalog?sale=true" 
               className="text-gray-700 hover:text-emerald-600 font-medium transition-colors relative"
             >
               Скидки
@@ -48,7 +57,7 @@ const Header = () => {
               </Badge>
             </Link>
             <Link 
-              href="/new" 
+              href="/catalog?new=true" 
               className="text-gray-700 hover:text-emerald-600 font-medium transition-colors"
             >
               Новинки
@@ -57,70 +66,82 @@ const Header = () => {
 
           {/* Search Bar */}
           <div className="hidden lg:flex flex-1 max-w-sm mx-8">
-            <div className="relative w-full">
+            <form onSubmit={handleSearch} className="relative w-full">
               <input
                 type="text"
                 placeholder="Поиск кроссовок..."
-                className="w-full px-4 py-2 pl-10 pr-4 border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full px-4 py-2 pl-10 pr-4 border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all bg-white text-gray-800"
               />
-              <svg
-                className="absolute left-3 top-2.5 h-5 w-5 text-emerald-400"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+              <button
+                type="submit"
+                className="absolute left-3 top-2.5 h-5 w-5 text-emerald-400 hover:text-emerald-600 transition-colors"
               >
-                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
+                <svg
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </button>
+            </form>
           </div>
 
           {/* Right Actions */}
           <div className="flex items-center space-x-4">
             {/* Favorites */}
-            <Button variant="ghost" size="icon" className="hidden sm:flex">
-              <svg
-                className="h-5 w-5"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-              </svg>
-            </Button>
+            <Link href="/favorites">
+              <Button variant="ghost" size="icon" className="hidden sm:flex relative border border-emerald-200 bg-white">
+                <svg
+                  className="h-5 w-5 text-gray-600"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+              </Button>
+            </Link>
 
             {/* Cart */}
-            <Button variant="ghost" size="icon" className="relative">
-              <svg
-                className="h-5 w-5"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.293 2.293A1 1 0 005 17h16M16 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4z" />
-              </svg>
-              {cartCount > 0 && (
-                <Badge 
-                  variant="default" 
-                  className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs"
+            <Link href="/cart">
+              <Button variant="ghost" size="icon" className="relative border border-emerald-200 bg-white">
+                <svg
+                  className="h-5 w-5 text-gray-600"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
                 >
-                  {cartCount}
-                </Badge>
-              )}
-            </Button>
+                  <path d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.293 2.293A1 1 0 005 17h16M16 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4z" />
+                </svg>
+                {cartCount > 0 && (
+                  <Badge 
+                    variant="default" 
+                    className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs "
+                  >
+                    {cartCount}
+                  </Badge>
+                )}
+              </Button>
+            </Link>
 
             {/* Profile */}
-            <Button variant="outline" size="sm" className="hidden sm:flex">
-              Войти
-            </Button>
+            <Link href="/login">
+              <Button variant="outline" size="sm" className="hidden sm:flex text-gray-600">
+                Войти
+              </Button>
+            </Link>
 
             {/* Mobile Menu Toggle */}
             <Button
@@ -154,30 +175,76 @@ const Header = () => {
             <div className="flex flex-col space-y-4">
               {/* Mobile Search */}
               <div className="px-2">
-                <input
-                  type="text"
-                  placeholder="Поиск кроссовок..."
-                  className="w-full px-4 py-2 border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                />
+                <form onSubmit={handleSearch} className="relative">
+                  <input
+                    type="text"
+                    placeholder="Поиск кроссовок..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full px-4 py-2 pr-10 border border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  />
+                  <button
+                    type="submit"
+                    className="absolute right-3 top-2.5 h-5 w-5 text-emerald-400"
+                  >
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </button>
+                </form>
               </div>
               
-              <Link href="/catalog" className="px-2 py-2 text-gray-700 hover:text-emerald-600">
+              {/* Mobile Navigation Links */}
+              <Link 
+                href="/catalog" 
+                className="px-2 py-2 text-gray-700 hover:text-emerald-600"
+                onClick={() => setIsMenuOpen(false)}
+              >
                 Каталог
               </Link>
-              <Link href="/brands" className="px-2 py-2 text-gray-700 hover:text-emerald-600">
+              <Link 
+                href="/brands" 
+                className="px-2 py-2 text-gray-700 hover:text-emerald-600"
+                onClick={() => setIsMenuOpen(false)}
+              >
                 Бренды
               </Link>
-              <Link href="/sale" className="px-2 py-2 text-gray-700 hover:text-emerald-600">
+              <Link 
+                href="/catalog?sale=true" 
+                className="px-2 py-2 text-gray-700 hover:text-emerald-600"
+                onClick={() => setIsMenuOpen(false)}
+              >
                 Скидки
               </Link>
-              <Link href="/new" className="px-2 py-2 text-gray-700 hover:text-emerald-600">
+              <Link 
+                href="/catalog?new=true" 
+                className="px-2 py-2 text-gray-700 hover:text-emerald-600"
+                onClick={() => setIsMenuOpen(false)}
+              >
                 Новинки
               </Link>
               
-              <div className="px-2 pt-2 border-t border-emerald-100">
-                <Button variant="gradient" className="w-full">
-                  Войти
-                </Button>
+              {/* Mobile Actions */}
+              <div className="px-2 pt-2 border-t border-emerald-100 space-y-2">
+                <Link 
+                  href="/favorites"
+                  className="block w-full text-left py-2 text-gray-700 hover:text-emerald-600"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Избранное
+                </Link>
+                <Link 
+                  href="/cart"
+                  className="block w-full text-left py-2 text-gray-700 hover:text-emerald-600"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Корзина {cartCount > 0 && `(${cartCount})`}
+                </Link>
+                <Link href="/login" onClick={() => setIsMenuOpen(false)}>
+                  <Button variant="gradient" className="w-full mt-2 text-gray-600">
+                    Войти
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>

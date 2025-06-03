@@ -1,51 +1,30 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // src/app/page.tsx
 'use client';
 
-import React from 'react';
-import Header from '@/components/layout/Header';
+import React, { useState } from 'react';
+// import Layout from '@/components/layout/Layout';
 import ProductCard from '@/components/products/ProductCard';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { useProducts } from '@/hooks/useProducts';
+import Link from 'next/link';
 
 const HomePage = () => {
-  const { 
-    products,
-    loading,
-    error,
-    refetch: refetchFeatured 
-  } = useProducts({ 
+      const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const { products, loading, error, refetch } = useProducts({ 
     featured: true, 
     limit: 8 
   });
 
-  // Загружаем новинки
-  const { products: newProducts, loading: newLoading } = useProducts({ 
-    limit: 4 
-  });
-
-  const handleAddToCart = (product: any) => {
-    console.log('🛒 Add to cart:', product.slug, product.Name);
-    // TODO: Интеграция с корзиной
-  };
-
-  const handleToggleFavorite = (product: any) => {
-    console.log('❤️ Toggle favorite:', product.slug, product.Name);
-    // TODO: Интеграция с избранным
-  };
-
   const handleRefreshProducts = () => {
-    console.log('🔄 Refreshing products...');
-    refetchFeatured();
+    console.log('🔄 Обновляем рекомендуемые товары...');
+    refetch();
   };
-
 
   return (
-    <div className="min-h-screen bg-white">
-      <Header />
-      
+    <>
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-emerald-50 via-white to-teal-50 overflow-hidden">
         <div className="container mx-auto px-4 py-20 lg:py-32">
@@ -68,9 +47,15 @@ const HomePage = () => {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button variant="gradient" size="lg">
+                <Link 
+                href="/catalog" 
+                className="px-2 py-2 text-white hover:text-emerald-600"
+                onClick={() => setIsMenuOpen(false)}
+              >
                 Смотреть каталог
+              </Link>
               </Button>
-              <Button variant="outline" size="lg">
+              <Button variant="outline" size="lg" className='text-gray-400'>
                 Новинки
               </Button>
             </div>
@@ -215,7 +200,13 @@ const HomePage = () => {
           {!loading && !error && products.length > 0 && (
             <div className="text-center mt-12">
               <Button variant="outline" size="lg">
+                <Link 
+                href="/catalog" 
+                className="px-2 py-2 hover:text-emerald-600 text-gray-500"
+                onClick={() => setIsMenuOpen(false)}
+              >
                 Смотреть все товары
+              </Link>
               </Button>
             </div>
           )}
@@ -237,7 +228,7 @@ const HomePage = () => {
               <input
                 type="email"
                 placeholder="Ваш email"
-                className="flex-1 px-4 py-3 rounded-lg border-0 focus:outline-none focus:ring-2 focus:ring-white"
+                className="flex-1 px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-white border-white"
               />
               <Button variant="secondary" size="lg" className="bg-white text-emerald-600 hover:bg-gray-50">
                 Подписаться
@@ -246,59 +237,7 @@ const HomePage = () => {
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-16">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">S</span>
-                </div>
-                <span className="text-xl font-bold">SneakerStore</span>
-              </div>
-              <p className="text-gray-400">
-                Ваш надежный партнер в мире качественной спортивной обуви
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Каталог</h3>
-              <div className="space-y-2 text-gray-400">
-                <div>Мужские кроссовки</div>
-                <div>Женские кроссовки</div>
-                <div>Детские кроссовки</div>
-                <div>Спортивная обувь</div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Информация</h3>
-              <div className="space-y-2 text-gray-400">
-                <div>О компании</div>
-                <div>Доставка и оплата</div>
-                <div>Возврат товара</div>
-                <div>Гарантии</div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Контакты</h3>
-              <div className="space-y-2 text-gray-400">
-                <div>+7 (800) 123-45-67</div>
-                <div>info@sneakerstore.ru</div>
-                <div>Москва, ул. Примерная, 123</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 SneakerStore. Все права защищены.</p>
-          </div>
-        </div>
-      </footer>
-    </div>
+    </>
   );
 };
 

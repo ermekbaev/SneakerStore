@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable react-hooks/exhaustive-deps */
 // src/hooks/useProducts.ts
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 export interface Product {
   slug: string;
@@ -42,7 +41,7 @@ export const useProducts = (options: UseProductsOptions = {}): UseProductsReturn
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -114,21 +113,16 @@ export const useProducts = (options: UseProductsOptions = {}): UseProductsReturn
     } finally {
       setLoading(false);
     }
-  };
+  }, [options.featured, options.category, options.brand, options.limit, options.search]);
 
-  const refetch = () => {
+  const refetch = useCallback(() => {
+    console.log('🔄 Refetching products...');
     fetchProducts();
-  };
+  }, [fetchProducts]);
 
   useEffect(() => {
     fetchProducts();
-  }, [
-    options.featured,
-    options.category,
-    options.brand,
-    options.limit,
-    options.search
-  ]);
+  }, [fetchProducts]);
 
   return {
     products,
